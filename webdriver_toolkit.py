@@ -10,12 +10,6 @@ class WebDriverToolKit:
     def __init__(self, driver):
         self.__driver = driver
 
-    def add_driver(self, driver):
-        self.__driver = driver
-
-    def open_site(self, url: str):
-        self.__driver.get(url)
-
     def find_element_by_text(self, text):
         web_element = self.__driver.find_element(By.XPATH, f"//*[contains(text(), '{text}' )]")
         return web_element
@@ -31,6 +25,27 @@ class WebDriverToolKit:
     def find_elements_by_tag_and_text(self, tag, text):
         web_elements = self.__driver.find_elements(By.XPATH, f"//{tag}[contains(text(), '{text}' )]")
         return web_elements
+
+    def element_is_present(self, wait_time, locator: tuple):
+        try:
+            WebDriverWait(self.__driver, wait_time).until(EC.presence_of_element_located(locator))
+            return True
+        except TimeoutException:
+            return False
+
+    def element_is_visible(self, wait_time, locator: tuple):
+        try:
+            WebDriverWait(self.__driver, wait_time).until(EC.visibility_of_element_located(locator))
+            return True
+        except TimeoutException:
+            return False
+
+    def element_is_invisible(self, wait_time, locator: tuple):
+        try:
+            WebDriverWait(self.__driver, wait_time).until(EC.invisibility_of_element_located(locator))
+            return True
+        except TimeoutException:
+            return False
 
     def element_is_clickable(self, wait_time, locator: tuple):
         try:
