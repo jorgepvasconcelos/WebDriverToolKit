@@ -1,4 +1,6 @@
 import traceback
+from time import sleep
+from random import uniform
 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
@@ -25,6 +27,13 @@ class WebDriverToolKit:
     def find_elements_by_tag_and_text(self, tag, text):
         web_elements = self.__driver.find_elements(By.XPATH, f"//{tag}[contains(text(), '{text}' )]")
         return web_elements
+
+    def fill_field_in_random_time(self, text: str, locator: tuple):
+        element = self.__driver.find_element(*locator)
+        for letter in text:
+            time = uniform(0.5, 2)
+            sleep(time)
+            element.send_keys(letter)
 
     def element_is_present(self, wait_time, locator: tuple):
         try:
