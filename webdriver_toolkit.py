@@ -5,7 +5,7 @@ from random import uniform
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
-from selenium.common.exceptions import TimeoutException
+from selenium.common.exceptions import TimeoutException, InvalidSessionIdException
 
 
 class WebDriverToolKit:
@@ -61,4 +61,11 @@ class WebDriverToolKit:
             WebDriverWait(self.__driver, wait_time).until(EC.element_to_be_clickable(locator))
             return True
         except TimeoutException:
+            return False
+
+    def webdriver_is_open(self):
+        try:
+            self.__driver.get('https://www.google.com/')
+            return True
+        except InvalidSessionIdException:
             return False

@@ -1,3 +1,5 @@
+import time
+
 from selenium.webdriver import Chrome
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
@@ -12,9 +14,11 @@ wtk = WebDriverToolKit(driver=driver)
 
 driver.get('https://webscraper.io/test-sites/e-commerce/allinone/product/545')
 
-if wtk.element_is_clickable(wait_time=20, locator=(By.CSS_SELECTOR, '[class="btn swatch disabled btn-primary"]')):
-    print('é clicavel')
-else:
-    print('nao é clicavel')
 
+time.sleep(2)
 driver.close()
+
+if wtk.webdriver_is_open():
+    print('esta aberto')
+else:
+    print('esta fechado')
