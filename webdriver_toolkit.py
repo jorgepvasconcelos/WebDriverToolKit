@@ -28,12 +28,16 @@ class WebDriverToolKit:
         web_elements = self.__driver.find_elements(By.XPATH, f"//{tag}[contains(text(), '{text}' )]")
         return web_elements
 
-    def fill_field_in_random_time(self, text: str, locator: tuple):
+    def fill_field_in_random_time(self, text: str, locator: tuple) -> None:
         element = self.__driver.find_element(*locator)
         for letter in text:
             time = uniform(0.3, 0.8)
             sleep(time)
             element.send_keys(letter)
+
+    def clear_and_fill_field(self, text: str, locator: tuple) -> None:
+        self.__driver.find_element(*locator).clear()
+        self.fill_field_in_random_time(text=text, locator=locator)
 
     def element_is_present(self, wait_time: int, locator: tuple) -> bool:
         try:
@@ -63,7 +67,7 @@ class WebDriverToolKit:
         except TimeoutException:
             return False
 
-    def webdriver_is_open(self):
+    def webdriver_is_open(self) -> bool:
         try:
             self.__driver.get('https://www.google.com/')
             return True
