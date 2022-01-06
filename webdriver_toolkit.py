@@ -69,7 +69,7 @@ class WebDriverToolKit:
 
     def webdriver_is_open(self) -> bool:
         try:
-            self.__driver.get('https://www.google.com/')
+            self.__driver.execute_script("console.log('ola eu estou funcionando');")
             return True
         except InvalidSessionIdException:
             return False
