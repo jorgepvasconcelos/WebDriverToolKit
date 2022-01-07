@@ -67,6 +67,12 @@ class WebDriverToolKit:
         except TimeoutException:
             return False
 
+    def page_is_loading(self) -> bool:
+        if self.__driver.execute_script('return document.readyState') != 'complete':
+            return True
+        else:
+            return False
+
     def webdriver_is_open(self) -> bool:
         try:
             self.__driver.execute_script("console.log('ola eu estou funcionando');")
