@@ -80,6 +80,9 @@ class WebDriverToolKit:
         else:
             return False
 
+    def driver_hard_refresh(self):
+        self.__driver.execute_script('location.reload(true)')
+
     def webdriver_is_open(self) -> bool:
         try:
             self.__driver.execute_script("console.log('ola eu estou funcionando');")
