@@ -67,6 +67,13 @@ class WebDriverToolKit:
         except TimeoutException:
             return False
 
+    def text_is_present(self, wait_time: int, locator: tuple, text: str) -> bool:
+        try:
+            WebDriverWait(self.__driver, wait_time).until(EC.text_to_be_present_in_element(locator, text_=text))
+            return True
+        except TimeoutException:
+            return False
+
     def page_is_loading(self) -> bool:
         if self.__driver.execute_script('return document.readyState') != 'complete':
             return True
