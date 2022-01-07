@@ -74,6 +74,13 @@ class WebDriverToolKit:
         except TimeoutException:
             return False
 
+    def alert_is_present(self, wait_time: int, message: str) -> bool:
+        try:
+            WebDriverWait(self.__driver, wait_time).until(EC.alert_is_present(), message=message)
+            return True
+        except TimeoutException:
+            return False
+
     def page_is_loading(self) -> bool:
         if self.__driver.execute_script('return document.readyState') != 'complete':
             return True
