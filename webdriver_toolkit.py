@@ -40,9 +40,12 @@ class WebDriverToolKit:
             sleep(time)
             element.send_keys(letter)
 
-    def clear_and_fill_field(self, text: str, locator: tuple) -> None:
+    def clear_and_fill_field(self, text: str, locator: tuple, random_time=False) -> None:
         self.__driver.find_element(*locator).clear()
-        self.fill_field_in_random_time(text=text, locator=locator)
+        if random_time:
+            self.fill_field_in_random_time(text=text, locator=locator)
+        else:
+            self.fill_field(text=text, locator=locator)
 
     def element_is_present(self, wait_time: int, locator: tuple) -> bool:
         try:
