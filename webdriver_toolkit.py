@@ -29,6 +29,10 @@ class WebDriverToolKit:
         web_elements = self.__driver.find_elements(By.XPATH, f"//{tag}[contains(text(), '{text}' )]")
         return web_elements
 
+    def fill_field(self, text: str, locator: tuple) -> None:
+        element = self.__driver.find_element(*locator)
+        element.send_keys(text)
+
     def fill_field_in_random_time(self, text: str, locator: tuple) -> None:
         element = self.__driver.find_element(*locator)
         for letter in text:
