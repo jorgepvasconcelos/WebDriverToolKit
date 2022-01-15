@@ -6,11 +6,12 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.common.exceptions import TimeoutException, InvalidSessionIdException
+from selenium.webdriver.remote.webdriver import WebDriver
 
 
 class WebDriverToolKit:
     def __init__(self, driver):
-        self.__driver = driver
+        self.__driver: WebDriver = driver
 
     def find_element_by_text(self, text: str):
         web_element = self.__driver.find_element(By.XPATH, f"//*[contains(text(), '{text}' )]")
