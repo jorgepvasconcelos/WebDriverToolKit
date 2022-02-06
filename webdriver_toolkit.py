@@ -95,8 +95,8 @@ class WebDriverToolKit:
         else:
             return False
 
-    def block_urls(self, urls: list):
-        self.__driver.execute_cdp_cmd('Network.setBlockedURLs', {'urls':urls})
+    def block_urls(self, urls: list) -> None:
+        self.__driver.execute_cdp_cmd('Network.setBlockedURLs', {'urls': urls})
         self.__driver.execute_cdp_cmd('Network.enable', {})
 
     def driver_hard_refresh(self):
