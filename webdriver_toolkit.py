@@ -29,23 +29,23 @@ class WebDriverToolKit:
         web_elements = self.__driver.find_elements(By.XPATH, f"//{tag}[contains(text(), '{text}' )]")
         return web_elements
 
-    def fill_field(self, text: str, locator: tuple) -> None:
+    def fill(self, text: str, locator: tuple) -> None:
         element = self.__driver.find_element(*locator)
         element.send_keys(text)
 
-    def fill_field_in_random_time(self, text: str, locator: tuple) -> None:
+    def fill_in_random_time(self, text: str, locator: tuple) -> None:
         element = self.__driver.find_element(*locator)
         for letter in text:
             time = uniform(0.3, 0.8)
             sleep(time)
             element.send_keys(letter)
 
-    def clear_and_fill_field(self, text: str, locator: tuple, random_time=False) -> None:
+    def clear_and_fill(self, text: str, locator: tuple, random_time=False) -> None:
         self.__driver.find_element(*locator).clear()
         if random_time:
-            self.fill_field_in_random_time(text=text, locator=locator)
+            self.fill_in_random_time(text=text, locator=locator)
         else:
-            self.fill_field(text=text, locator=locator)
+            self.fill(text=text, locator=locator)
 
     def element_is_present(self, wait_time: int, locator: tuple) -> bool:
         try:
