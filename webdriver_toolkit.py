@@ -29,13 +29,13 @@ class WebDriverToolKit:
         web_elements = self.__driver.find_elements(By.XPATH, f"//{tag}[contains(text(), '{text}' )]")
         return web_elements
 
-    def get_text(self, locator: tuple):
+    def get_text(self, locator: tuple) -> str:
         try:
             return self.__driver.find_element(*locator).text
         except NoSuchElementException as e:
             raise e
 
-    def get_attribute(self, locator: tuple, attribute: str):
+    def get_attribute(self, locator: tuple, attribute: str) -> str:
         try:
             return self.__driver.find_element(*locator).get_attribute(attribute)
         except NoSuchElementException as e:
