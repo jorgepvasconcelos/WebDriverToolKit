@@ -5,7 +5,7 @@ from random import uniform
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
-from selenium.common.exceptions import TimeoutException, InvalidSessionIdException
+from selenium.common.exceptions import TimeoutException, InvalidSessionIdException, NoSuchElementException
 from selenium.webdriver.remote.webdriver import WebDriver
 
 
@@ -28,6 +28,18 @@ class WebDriverToolKit:
     def find_elements_by_tag_and_text(self, tag: str, text: str):
         web_elements = self.__driver.find_elements(By.XPATH, f"//{tag}[contains(text(), '{text}' )]")
         return web_elements
+
+    def get_text(self, locator: tuple):
+        try:
+            return self.__driver.find_element(*locator).text
+        except NoSuchElementException as e:
+            raise e
+
+    def get_attribute(self, locator: tuple, attribute: str):
+        try:
+            return self.__driver.find_element(*locator).get_attribute(attribute)
+        except NoSuchElementException as e:
+            raise e
 
     def fill(self, text: str, locator: tuple) -> None:
         element = self.__driver.find_element(*locator)
