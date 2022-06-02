@@ -25,6 +25,17 @@ class WebDriverToolKit:
 
         return web_element
 
+    def query_selector_all(self, query_selector: str) -> Union[WebElement, None]:
+        if not query_selector:
+            raise ValueError('You need send a query_selector')
+
+        if query_selector[0] == '/':
+            web_elements = self.__driver.find_elements(By.XPATH, query_selector)
+        else:
+            web_elements = self.__driver.find_elements(By.CSS_SELECTOR, query_selector)
+
+        return web_elements
+
     def find_element_by_text(self, text: str):
         web_element = self.__driver.find_element(By.XPATH, f"//*[contains(text(), '{text}' )]")
         return web_element
