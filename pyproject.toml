@@ -1,9 +1,13 @@
 [tool.poetry]
 name = "webdriver-toolkit"
-version = "0.1.0"
-description = ""
+version = "0.0.1"
+description = "this is not a awesome description"
 license = "MIT"
-authors = ["Jorge Vasconcelos <>"]
+authors = ["Jorge Vasconcelos <john@example.com>"]
+keywords = ["selenium", "webdriver"]
+readme = "README.md"
+homepage = "https://github.com/jorgepvasconcelos/webdriver-toolkit"
+repository = "https://github.com/jorgepvasconcelos/webdriver-toolkit"
 
 [tool.poetry.dependencies]
 python = "^3.9"
