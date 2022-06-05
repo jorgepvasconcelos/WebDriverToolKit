@@ -64,6 +64,9 @@ class SeleniumToolKit:
         except NoSuchElementException as e:
             raise e
 
+    def click(self, locator: tuple) -> None:
+        self.__driver.find_element(*locator).click()
+
     def fill(self, text: str, locator: tuple) -> None:
         element = self.__driver.find_element(*locator)
         element.send_keys(text)
