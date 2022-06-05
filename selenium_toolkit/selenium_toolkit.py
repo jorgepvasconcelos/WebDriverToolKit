@@ -25,7 +25,7 @@ class SeleniumToolKit:
 
         return web_element
 
-    def query_selector_all(self, query_selector: str) -> Union[WebElement, None]:
+    def query_selector_all(self, query_selector: str) -> Union[list[WebElement], None]:
         if not query_selector:
             raise ValueError('You need send a query_selector')
 
@@ -134,7 +134,7 @@ class SeleniumToolKit:
         self.__driver.execute_cdp_cmd('Network.setBlockedURLs', {'urls': urls})
         self.__driver.execute_cdp_cmd('Network.enable', {})
 
-    def driver_hard_refresh(self):
+    def driver_hard_refresh(self) -> None:
         self.__driver.execute_script('location.reload(true)')
 
     def webdriver_is_open(self) -> bool:
