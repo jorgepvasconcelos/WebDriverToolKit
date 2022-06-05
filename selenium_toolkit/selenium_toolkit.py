@@ -10,7 +10,7 @@ from selenium.common.exceptions import TimeoutException, InvalidSessionIdExcepti
 from selenium.webdriver.remote.webdriver import WebDriver, WebElement
 
 
-class WebDriverToolKit:
+class SeleniumToolKit:
     def __init__(self, driver):
         self.__driver: WebDriver = driver
 

@@ -4,13 +4,13 @@ from selenium.webdriver import Chrome
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 
-from webdriver_toolkit import WebDriverToolKit
+from selenium_toolkit import SeleniumToolKit
 
 options = Options()
 options.add_argument('--start-maximized')
 driver = Chrome(options=options)
 
-wtk = WebDriverToolKit(driver=driver)
+wtk = SeleniumToolKit(driver=driver)
 
 driver.get('https://webscraper.io/test-sites/e-commerce/allinone/product/545')
 
