@@ -14,6 +14,9 @@ class SeleniumToolKit:
     def __init__(self, driver):
         self.__driver: WebDriver = driver
 
+    def goto(self, url: str) -> None:
+        self.__driver.get(url=url)
+
     def query_selector(self, query_selector: str) -> Union[WebElement, None]:
         if not query_selector:
             raise ValueError('You need send a query_selector')
