@@ -1,5 +1,5 @@
 import traceback
-from time import sleep
+import time
 from random import uniform
 from typing import Union, Optional
 
@@ -14,7 +14,9 @@ class SeleniumToolKit:
     def __init__(self, driver):
         self.__driver: WebDriver = driver
 
-    def goto(self, url: str) -> None:
+    def goto(self, url: str, wait_time: Union[int, float] = 0) -> None:
+        if wait_time:
+            time.sleep(wait_time)
         self.__driver.get(url=url)
 
     def query_selector(self, query_selector: str) -> Union[WebElement, None]:
@@ -77,8 +79,7 @@ class SeleniumToolKit:
     def fill_in_random_time(self, text: str, locator: tuple) -> None:
         element = self.__driver.find_element(*locator)
         for letter in text:
-            time = uniform(0.3, 0.8)
-            sleep(time)
+            time.sleep(uniform(0.3, 0.8))
             element.send_keys(letter)
 
     def clear_and_fill(self, text: str, locator: tuple, random_time=False) -> None:
