@@ -1,3 +1,4 @@
+import json
 import traceback
 import time
 from random import uniform
@@ -150,3 +151,21 @@ class SeleniumToolKit:
             return True
         except InvalidSessionIdException:
             return False
+
+    def response_data_from_request(self, url: str) -> list:
+        logs_raw = self.__driver.get_log("performance")
+        parsed_logs = [json.loads(lr["message"])["message"] for lr in logs_raw]
+
+        received_response_list = [response for response in parsed_logs
+                                  if response["method"] == "Network.responseReceived"]
+
+        response_list = []
+        for response in received_response_list:
+            request_id = response["params"]["requestId"]
+            resp_url = response["params"]["response"]["url"]
+
+            if resp_url == url:
+                response_body = self.__driver.execute_cdp_cmd("Network.getResponseBody", {"requestId": request_id})
+                response_list.append(response_body)
+
+        return response_list
