@@ -161,6 +161,14 @@ class SeleniumToolKit:
             return False
 
     def response_data_from_request(self, url: str) -> list:
+        """
+        !!! ALERT !!!
+        For this method works the code below is necessary in the driver's creation
+
+        capabilities = DesiredCapabilities.CHROME
+        capabilities["goog:loggingPrefs"] = {"performance": "ALL"}
+        driver = webdriver.Chrome(desired_capabilities=capabilities
+        """
         if not isinstance(self.__driver, ChromiumDriver):
             TypeError("Your driver must be a ChromiumDriver type to use this method")
 
