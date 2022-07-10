@@ -15,6 +15,10 @@ class SeleniumToolKit:
     def __init__(self, driver):
         self.__driver: WebDriver = driver
 
+    @property
+    def driver(self):
+        return self.__driver
+
     def goto(self, url: str, wait_time: Union[int, float] = 0) -> None:
         if wait_time:
             time.sleep(wait_time)
