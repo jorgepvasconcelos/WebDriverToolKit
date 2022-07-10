@@ -2,8 +2,9 @@ import json
 import traceback
 import time
 from random import uniform
-from typing import Union, Optional
+from typing import Union
 
+from selenium.webdriver.chromium.webdriver import ChromiumDriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
@@ -13,10 +14,10 @@ from selenium.webdriver.remote.webdriver import WebDriver, WebElement
 
 class SeleniumToolKit:
     def __init__(self, driver):
-        self.__driver: WebDriver = driver
+        self.__driver: Union[WebDriver, ChromiumDriver] = driver
 
     @property
-    def driver(self):
+    def driver(self) -> Union[WebDriver, ChromiumDriver]:
         return self.__driver
 
     def goto(self, url: str, wait_time: Union[int, float] = 0) -> None:
