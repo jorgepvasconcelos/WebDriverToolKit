@@ -144,6 +144,9 @@ class SeleniumToolKit:
             return False
 
     def block_urls(self, urls: list) -> None:
+        if not isinstance(self.__driver, ChromiumDriver):
+            TypeError("Your driver must be a ChromiumDriver type to use this method")
+
         self.__driver.execute_cdp_cmd('Network.setBlockedURLs', {'urls': urls})
         self.__driver.execute_cdp_cmd('Network.enable', {})
 
@@ -158,6 +161,9 @@ class SeleniumToolKit:
             return False
 
     def response_data_from_request(self, url: str) -> list:
+        if not isinstance(self.__driver, ChromiumDriver):
+            TypeError("Your driver must be a ChromiumDriver type to use this method")
+
         logs_raw = self.__driver.get_log("performance")
         parsed_logs = [json.loads(lr["message"])["message"] for lr in logs_raw]
 
