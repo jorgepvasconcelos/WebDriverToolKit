@@ -20,9 +20,7 @@ class SeleniumToolKit:
     def driver(self) -> Union[WebDriver, ChromiumDriver]:
         return self.__driver
 
-    def goto(self, url: str, wait_time: Union[int, float] = 0) -> None:
-        if wait_time:
-            time.sleep(wait_time)
+    def goto(self, url: str) -> None:
         self.__driver.get(url=url)
 
     def query_selector(self, query_selector: str) -> Union[WebElement, None]:
