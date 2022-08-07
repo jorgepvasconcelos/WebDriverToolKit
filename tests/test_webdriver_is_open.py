@@ -16,3 +16,8 @@ driver.get('https://webscraper.io/test-sites/e-commerce/allinone/product/545')
 
 time.sleep(2)
 driver.close()
+
+if wtk.webdriver_is_open():
+    print('esta aberto')
+else:
+    print('esta fechado')
