@@ -11,6 +11,8 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.common.exceptions import TimeoutException, InvalidSessionIdException, NoSuchElementException
 from selenium.webdriver.remote.webdriver import WebDriver, WebElement
 
+from selenium_toolkit.utils import create_locator
+
 
 class SeleniumToolKit:
     def __init__(self, driver):
@@ -46,84 +48,93 @@ class SeleniumToolKit:
         return web_elements
 
     def find_element_by_text(self, text: str):
-        web_element = self.__driver.find_element(By.XPATH, f"//*[contains(text(), '{text}' )]")
+        query_selector = f"//*[contains(text(), '{text}' )]"
+        web_element = self.query_selector(query_selector=query_selector)
         return web_element
 
     def find_elements_by_text(self, text: str):
-        web_elements = self.__driver.find_elements(By.XPATH, f"//*[contains(text(), '{text}' )]")
-        return web_elements
-
-    def find_element_by_tag_and_text(self, tag: str, text: str):
-        web_element = self.__driver.find_element(By.XPATH, f"//{tag}[contains(text(), '{text}' )]")
+        query_selector = f"//*[contains(text(), '{text}' )]"
+        web_element = self.query_selector_all(query_selector=query_selector)
         return web_element
 
-    def find_elements_by_tag_and_text(self, tag: str, text: str):
-        web_elements = self.__driver.find_elements(By.XPATH, f"//{tag}[contains(text(), '{text}' )]")
+    def find_element_by_tag_and_text(self, tag: str, text: str):
+        query_selector = f"//{tag}[contains(text(), '{text}' )]"
+        web_elements = self.query_selector(query_selector=query_selector)
         return web_elements
 
-    def get_text(self, locator: tuple) -> str:
+    def find_elements_by_tag_and_text(self, tag: str, text: str):
+        query_selector = f"//{tag}[contains(text(), '{text}' )]"
+        web_elements = self.query_selector_all(query_selector=query_selector)
+        return web_elements
+
+    def get_text(self, query_selector: str) -> str:
         try:
-            return self.__driver.find_element(*locator).text
+            return self.query_selector(query_selector=query_selector).text
         except NoSuchElementException as e:
             raise e
 
-    def get_attribute(self, locator: tuple, attribute: str) -> str:
+    def get_attribute(self, query_selector: str, attribute: str) -> str:
         try:
-            return self.__driver.find_element(*locator).get_attribute(attribute)
+            return self.query_selector(query_selector=query_selector).get_attribute(attribute)
         except NoSuchElementException as e:
             raise e
 
-    def click(self, locator: tuple) -> None:
-        self.__driver.find_element(*locator).click()
+    def click(self, query_selector: str) -> None:
+        self.query_selector(query_selector=query_selector).click()
 
-    def fill(self, text: str, locator: tuple) -> None:
-        element = self.__driver.find_element(*locator)
+    def fill(self, text: str, query_selector: str) -> None:
+        element = self.query_selector(query_selector=query_selector)
         element.send_keys(text)
 
-    def fill_in_random_time(self, text: str, locator: tuple) -> None:
-        element = self.__driver.find_element(*locator)
+    def fill_in_random_time(self, text: str, query_selector: str) -> None:
+        element = self.query_selector(query_selector=query_selector)
         for letter in text:
             time.sleep(uniform(0.3, 0.8))
             element.send_keys(letter)
 
-    def clear_and_fill(self, text: str, locator: tuple, random_time=False) -> None:
-        self.__driver.find_element(*locator).clear()
+    def clear_and_fill(self, text: str, query_selector: str, random_time=False) -> None:
+        self.query_selector(query_selector=query_selector).clear()
         if random_time:
-            self.fill_in_random_time(text=text, locator=locator)
+            self.fill_in_random_time(text=text, query_selector=query_selector)
         else:
-            self.fill(text=text, locator=locator)
+            self.fill(text=text, query_selector=query_selector)
 
-    def element_is_present(self, wait_time: int, locator: tuple) -> bool:
+    def element_is_present(self, wait_time: int, query_selector: str) -> bool:
         try:
-            WebDriverWait(self.__driver, wait_time).until(EC.presence_of_element_located(locator))
+            WebDriverWait(self.__driver, wait_time).until(
+                EC.presence_of_element_located(create_locator(query_selector)))
             return True
         except TimeoutException:
             return False
 
-    def element_is_visible(self, wait_time: int, locator: tuple) -> bool:
+    def element_is_visible(self, wait_time: int, query_selector: str) -> bool:
         try:
-            WebDriverWait(self.__driver, wait_time).until(EC.visibility_of_element_located(locator))
+            WebDriverWait(self.__driver, wait_time).until(
+                EC.visibility_of_element_located(create_locator(query_selector)))
             return True
         except TimeoutException:
             return False
 
-    def element_is_invisible(self, wait_time: int, locator: tuple) -> bool:
+    def element_is_invisible(self, wait_time: int, query_selector: str) -> bool:
         try:
-            WebDriverWait(self.__driver, wait_time).until(EC.invisibility_of_element_located(locator))
+            WebDriverWait(self.__driver, wait_time).until(
+                EC.invisibility_of_element_located(create_locator(query_selector)))
             return True
         except TimeoutException:
             return False
 
-    def element_is_clickable(self, wait_time: int, locator: tuple) -> bool:
+    def element_is_clickable(self, wait_time: int, query_selector: str) -> bool:
         try:
-            WebDriverWait(self.__driver, wait_time).until(EC.element_to_be_clickable(locator))
+            WebDriverWait(self.__driver, wait_time).until(
+                EC.element_to_be_clickable(create_locator(query_selector)))
             return True
         except TimeoutException:
             return False
 
-    def text_is_present(self, wait_time: int, locator: tuple, text: str) -> bool:
+    def text_is_present(self, wait_time: int, query_selector: str, text: str) -> bool:
         try:
-            WebDriverWait(self.__driver, wait_time).until(EC.text_to_be_present_in_element(locator, text_=text))
+            WebDriverWait(self.__driver, wait_time).until(
+                EC.text_to_be_present_in_element(create_locator(query_selector), text_=text))
             return True
         except TimeoutException:
             return False
