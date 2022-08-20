@@ -6,16 +6,13 @@ from selenium.webdriver.chrome.options import Options
 from selenium_toolkit import SeleniumToolKit
 
 
-def test_webdriver_is_open():
+def test_element_is_present():
     options = Options()
-    options.add_argument('--start-maximized')
     driver = Chrome(options=options)
 
     sk = SeleniumToolKit(driver=driver)
 
     sk.goto('https://webscraper.io/test-sites/e-commerce/allinone/product/545')
+    sk.element_is_present(wait_time=5, query_selector='[class="pull-right price"]')
 
-    time.sleep(2)
     driver.close()
-
-    assert not sk.webdriver_is_open()
