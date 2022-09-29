@@ -11,6 +11,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.common.exceptions import TimeoutException, InvalidSessionIdException, NoSuchElementException
 from selenium.webdriver.remote.webdriver import WebDriver, WebElement
 
+from selenium_toolkit.auto_wait import auto_wait
 from selenium_toolkit.utils import create_locator
 
 
@@ -22,6 +23,7 @@ class SeleniumToolKit:
     def driver(self) -> Union[WebDriver, ChromiumDriver]:
         return self.__driver
 
+    @auto_wait
     def goto(self, url: str) -> None:
         self.__driver.get(url=url)
 
