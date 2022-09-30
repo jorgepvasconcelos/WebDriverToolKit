@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "selenium-toolkit"
-version = "0.0.04"
+version = "0.0.05"
 description = "this is not a awesome description"
 license = "MIT"
 authors = ["Jorge Vasconcelos <john@example.com>"]
