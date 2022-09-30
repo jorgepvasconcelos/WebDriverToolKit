@@ -81,12 +81,18 @@ class SeleniumToolKit:
         except NoSuchElementException as e:
             raise e
 
+    @auto_wait
     def click(self, query_selector: str) -> None:
         self.query_selector(query_selector=query_selector).click()
 
+    @auto_wait
     def fill(self, text: str, query_selector: str) -> None:
         element = self.query_selector(query_selector=query_selector)
         element.send_keys(text)
+
+    @auto_wait
+    def clear(self, query_selector: str) -> None:
+        self.query_selector(query_selector=query_selector).clear()
 
     def fill_in_random_time(self, text: str, query_selector: str) -> None:
         element = self.query_selector(query_selector=query_selector)
@@ -95,7 +101,7 @@ class SeleniumToolKit:
             element.send_keys(letter)
 
     def clear_and_fill(self, text: str, query_selector: str, random_time=False) -> None:
-        self.query_selector(query_selector=query_selector).clear()
+        self.clear(query_selector=query_selector)
         if random_time:
             self.fill_in_random_time(text=text, query_selector=query_selector)
         else:
