@@ -8,7 +8,7 @@ from selenium_toolkit.auto_wait import AutoWait
 
 
 def test_AutoWait():
-    AutoWait.change_wait_time(times=1)
+    AutoWait.change_wait_time(range_time=(0, 1))
 
     options = Options()
     options.add_argument('--start-maximized')
@@ -18,7 +18,7 @@ def test_AutoWait():
 
     sk.goto('https://webscraper.io/test-sites/e-commerce/allinone/product/545')
 
-    AutoWait.change_wait_time(times=5)
+    AutoWait.change_wait_time(range_time=(5, 5))
 
     sk.goto('https://webscraper.io/test-sites/e-commerce/allinone/product/544')
 
