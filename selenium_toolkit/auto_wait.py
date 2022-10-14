@@ -1,5 +1,6 @@
 import time
 from random import uniform
+from typing import Type, Any
 
 
 class AutoWait:
@@ -23,7 +24,7 @@ class AutoWait:
         cls.__time_to_wait = range_time
 
 
-def auto_wait(func):
+def auto_wait(func) -> Type["Response"]:
     def wrapper(*args, **kwargs):
         range_wait = AutoWait.wait_time
 
