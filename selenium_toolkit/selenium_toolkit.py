@@ -3,16 +3,38 @@ import traceback
 import time
 from random import uniform
 from typing import Union
-
+from dataclasses import dataclass
+from http.cookies import SimpleCookie
 from selenium.webdriver.chromium.webdriver import ChromiumDriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
-from selenium.common.exceptions import TimeoutException, InvalidSessionIdException, NoSuchElementException
+from selenium.common.exceptions import TimeoutException, InvalidSessionIdException, NoSuchElementException, \
+    WebDriverException
 from selenium.webdriver.remote.webdriver import WebDriver, WebElement
 
 from selenium_toolkit.auto_wait import auto_wait
 from selenium_toolkit.utils import create_locator
+from enum import StrEnum
+
+
+class RequestType(StrEnum):
+    XHR = 'XHR'
+    IMAGE = 'Image'
+    SCRIPT = 'Script'
+    STYLESHEET = 'Stylesheet'
+    FONT = 'Font'
+    FETCH = 'Fetch'
+    OTHER = 'Other'
+
+
+@dataclass
+class Request:
+    url: str
+    request_id: str
+    cookies: dict
+    headers: dict
+    type: RequestType
 
 
 class SeleniumToolKit:
@@ -177,31 +199,98 @@ class SeleniumToolKit:
         except InvalidSessionIdException:
             return False
 
-    def response_data_from_request(self, url: str) -> list:
+    def get_request(self, request_url: str) -> Request | None:
+
         """
         !!! ALERT !!!
         For this method works the code below is necessary in the driver's creation
 
+        # selenium < 4.0
         capabilities = DesiredCapabilities.CHROME
         capabilities["goog:loggingPrefs"] = {"performance": "ALL"}
         driver = webdriver.Chrome(desired_capabilities=capabilities
+
+        # selenium > 4.0
+        capabilities = {"performance": "ALL"}
+        options.set_capability("goog:loggingPrefs", capabilities)
         """
+
         if not isinstance(self.__driver, ChromiumDriver):
             TypeError("Your driver must be a ChromiumDriver type to use this method")
 
         logs_raw = self.__driver.get_log("performance")
         parsed_logs = [json.loads(lr["message"])["message"] for lr in logs_raw]
 
-        received_response_list = [response for response in parsed_logs
-                                  if response["method"] == "Network.responseReceived"]
+        methods = ["Network.responseReceived", 'Network.requestWillBeSent', 'Network.requestWillBeSentExtraInfo']
+        received_response_list = [response for response in parsed_logs if response["method"] in methods]
 
-        response_list = []
+        resp_url = None
+        target_request_id = None
         for response in received_response_list:
-            request_id = response["params"]["requestId"]
-            resp_url = response["params"]["response"]["url"]
+            params = response["params"]
+            target_request_id = params.get("requestId")
+            if params.get("request"):
+                resp_url = params['request']['url']
+            elif params.get("response"):
+                resp_url = params['response']['url']
 
-            if resp_url == url:
-                response_body = self.__driver.execute_cdp_cmd("Network.getResponseBody", {"requestId": request_id})
-                response_list.append(response_body)
+            if resp_url and request_url in resp_url:
+                break
 
-        return response_list
+        if not resp_url:
+            return None
+
+        cookies = dict()
+        headers = dict()
+        url: str = None
+        request_type: RequestType = None
+        for response in received_response_list:
+            params = response["params"]
+            request_id = params.get("requestId")
+            method = response.get("method")
+
+            if target_request_id == request_id:
+
+                if method == 'Network.requestWillBeSentExtraInfo':
+                    headers = params.get('headers')
+
+                    cookies_string = headers.get('cookie')
+                    cookie_parser = SimpleCookie()
+                    cookie_parser.load(cookies_string)
+                    cookies = dict(cookie_parser)
+
+                if method == 'Network.requestWillBeSent':
+                    url = params['request']['url']
+                    request_type = RequestType(params['type'])
+
+        request_data = Request(url=url,
+                               request_id=target_request_id,
+                               cookies=cookies,
+                               headers=headers,
+                               type=request_type)
+
+        return request_data
+
+    def response_data_from_request(self, request_url: str, request_id: str = None) -> str | None:
+        if request_id:
+            response_body = self.__driver.execute_cdp_cmd("Network.getResponseBody", {"requestId": request_id})
+            return response_body
+
+        received_request = self.get_request(request_url=request_url)
+        if not received_request:
+            return None
+
+        return self.get_response_body_from_request_id(request_id=received_request.request_id)
+
+    def get_response_body_from_request_id(self, request_id: str = None) -> str | None:
+        try:
+            response_body = self.__driver.execute_cdp_cmd("Network.getResponseBody", {"requestId": request_id})
+        except WebDriverException:
+            return None
+
+        return response_body
+
+    def quit(self):
+        if self.webdriver_is_open():
+            self.__driver.quit()
+            return
