@@ -2,7 +2,7 @@ import json
 import traceback
 import time
 from random import uniform
-from typing import Union
+from typing import Union, Type
 from dataclasses import dataclass
 from http.cookies import SimpleCookie
 from selenium.webdriver.chromium.webdriver import ChromiumDriver
@@ -13,7 +13,6 @@ from selenium.common.exceptions import TimeoutException, InvalidSessionIdExcepti
     WebDriverException
 from selenium.webdriver.remote.webdriver import WebDriver, WebElement
 
-from selenium_toolkit.auto_wait import auto_wait
 from selenium_toolkit.utils import create_locator
 from enum import StrEnum
 
@@ -37,13 +36,34 @@ class Request:
     type: RequestType
 
 
+def auto_wait(func) -> Type["Response"]:
+    def wrapper(*args, **kwargs):
+        obj_wait_time = args[0]._wait_time_range
+        wait = uniform(*obj_wait_time)
+        time.sleep(wait)
+
+        return func(*args, **kwargs)
+
+    return wrapper
+
+
 class SeleniumToolKit:
+    _wait_time_range = (0, 0)
+
     def __init__(self, driver):
         self.__driver: Union[WebDriver, ChromiumDriver] = driver
 
     @property
     def driver(self) -> Union[WebDriver, ChromiumDriver]:
         return self.__driver
+
+    def change_wait_time(self, range_time: tuple = (0, 0)):
+        first, last = range_time
+
+        if not (first >= 0 and last >= first):
+            raise ValueError(f'range_time must be a tuple with positive values')
+
+        self._wait_time_range = range_time
 
     @auto_wait
     def goto(self, url: str) -> None:
