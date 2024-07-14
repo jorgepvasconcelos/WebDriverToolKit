@@ -275,6 +275,9 @@ class SeleniumToolKit:
                     headers = params.get('headers')
 
                     cookies_string = headers.get('cookie')
+                    if not cookies_string:
+                        continue
+
                     cookie_parser = SimpleCookie()
                     cookie_parser.load(cookies_string)
                     cookies = dict(cookie_parser)
