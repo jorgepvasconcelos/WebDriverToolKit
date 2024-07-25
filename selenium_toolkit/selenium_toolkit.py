@@ -219,7 +219,7 @@ class SeleniumToolKit:
         except InvalidSessionIdException:
             return False
 
-    def get_request(self, request_url: str) -> Request | None:
+    def get_requests(self, request_url: str) -> list[Request] | None:
 
         """
         !!! ALERT !!!
@@ -246,6 +246,7 @@ class SeleniumToolKit:
 
         resp_url = None
         target_request_id = None
+        matched_requests_id = set()
         for response in received_response_list:
             params = response["params"]
             target_request_id = params.get("requestId")
@@ -255,55 +256,61 @@ class SeleniumToolKit:
                 resp_url = params['response']['url']
 
             if resp_url and request_url in resp_url:
-                break
+                matched_requests_id.add(target_request_id)
 
-        if not resp_url:
+        if not matched_requests_id:
             return None
 
-        cookies = dict()
-        headers = dict()
-        url: str = None
-        request_type: RequestType = None
-        for response in received_response_list:
-            params = response["params"]
-            request_id = params.get("requestId")
-            method = response.get("method")
+        matched_requests = []
+        for target_request_id in matched_requests_id:
+            cookies = dict()
+            headers = dict()
+            url: str = None
+            request_type: RequestType = None
+            for response in received_response_list:
+                params = response["params"]
+                request_id = params.get("requestId")
+                method = response.get("method")
 
-            if target_request_id == request_id:
+                if target_request_id == request_id:
 
-                if method == 'Network.requestWillBeSentExtraInfo':
-                    headers = params.get('headers')
+                    if method == 'Network.requestWillBeSentExtraInfo':
+                        headers = params.get('headers')
 
-                    cookies_string = headers.get('cookie')
-                    if not cookies_string:
-                        continue
+                        cookies_string = headers.get('cookie')
+                        if not cookies_string:
+                            continue
 
-                    cookie_parser = SimpleCookie()
-                    cookie_parser.load(cookies_string)
-                    cookies = dict(cookie_parser)
+                        cookie_parser = SimpleCookie()
+                        cookie_parser.load(cookies_string)
+                        cookies = dict(cookie_parser)
 
-                if method == 'Network.requestWillBeSent':
-                    url = params['request']['url']
-                    request_type = RequestType(params['type'])
+                    if method == 'Network.requestWillBeSent':
+                        url = params['request']['url']
+                        request_type = RequestType(params['type'])
 
-        request_data = Request(url=url,
-                               request_id=target_request_id,
-                               cookies=cookies,
-                               headers=headers,
-                               type=request_type)
+            request_data = Request(url=url,
+                                   request_id=target_request_id,
+                                   cookies=cookies,
+                                   headers=headers,
+                                   type=request_type)
+            matched_requests.append(request_data)
 
-        return request_data
+        return matched_requests
 
     def response_data_from_request(self, request_url: str, request_id: str = None) -> str | None:
         if request_id:
             response_body = self.__driver.execute_cdp_cmd("Network.getResponseBody", {"requestId": request_id})
             return response_body
 
-        received_request = self.get_request(request_url=request_url)
-        if not received_request:
+        received_requests = self.get_requests(request_url=request_url)
+        if not received_requests:
             return None
 
-        return self.get_response_body_from_request_id(request_id=received_request.request_id)
+        if len(received_requests) > 1:
+            raise ValueError('more than one request matched')
+
+        return self.get_response_body_from_request_id(request_id=received_requests[0].request_id)
 
     def get_response_body_from_request_id(self, request_id: str = None) -> str | None:
         try:
