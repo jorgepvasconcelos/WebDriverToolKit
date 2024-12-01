@@ -320,6 +320,9 @@ class SeleniumToolKit:
 
         return response_body
 
+    def get_all_local_storage(self):
+        self.__driver.execute_script(f"return window.localStorage")
+
     def quit(self):
         if self.webdriver_is_open():
             self.__driver.quit()
