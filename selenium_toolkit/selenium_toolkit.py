@@ -220,8 +220,8 @@ class SeleniumToolKit:
         if not isinstance(self.__driver, ChromiumDriver):
             TypeError("Your driver must be a ChromiumDriver type to use this method")
 
-        self.__driver.execute_cdp_cmd('Network.setBlockedURLs', {'urls': urls})
-        self.__driver.execute_cdp_cmd('Network.enable', {})
+        self.execute_cdp_cmd('Network.setBlockedURLs', {'urls': urls})
+        self.execute_cdp_cmd('Network.enable', {})
 
     def driver_hard_refresh(self) -> None:
         self.__driver.execute_script('location.reload(true)')
@@ -314,7 +314,7 @@ class SeleniumToolKit:
 
     def response_data_from_request(self, request_url: str, request_id: str = None) -> str | None:
         if request_id:
-            response_body = self.__driver.execute_cdp_cmd("Network.getResponseBody", {"requestId": request_id})
+            response_body = self.execute_cdp_cmd("Network.getResponseBody", {"requestId": request_id})
             return response_body
 
         received_requests = self.get_requests(request_url=request_url)
@@ -328,11 +328,31 @@ class SeleniumToolKit:
 
     def get_response_body_from_request_id(self, request_id: str = None) -> str | None:
         try:
-            response_body = self.__driver.execute_cdp_cmd("Network.getResponseBody", {"requestId": request_id})
+            response_body = self.execute_cdp_cmd(cmd="Network.getResponseBody",cmd_args={"requestId": request_id})
         except WebDriverException:
             return None
 
         return response_body
+
+
+    # def execute_cdp_cmd(self, cmd: str, cmd_args: dict) -> str:
+    #     execute_command = {'method': cmd, 'params': cmd_args}
+    #     async def execute_cdp_async():
+    #         async with self.__driver.bidi_connection() as session:
+    #             cdp_session = session.session
+    #             return await cdp_session.execute(execute_command)
+    #
+    #     return trio.run(execute_cdp_async)
+
+    def execute_cdp_cmd(self, cmd: str, cmd_args: dict) -> str:
+        """
+        Useful for when executing CDP command in a remote driver
+        """
+        resource = "/session/%s/chromium/send_command_and_get_result" % self.__driver.session_id
+        url = self.__driver.command_executor._url + resource
+        body = json.dumps({'cmd': cmd, 'params': cmd_args})
+        response = self.__driver.command_executor._request('POST', url, body)
+        return response.get('value')
 
     def get_all_local_storage(self) -> dict:
         return self.__driver.execute_script(f"return window.localStorage")
