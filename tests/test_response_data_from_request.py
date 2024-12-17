@@ -13,8 +13,8 @@ def test_element_is_present():
     stk.goto('https://statusinvest.com.br/')
     time.sleep(5)
 
-    request_data = stk.get_request(request_url='https://statusinvest.com.br/account/userdata')
-    value = stk.get_response_body_from_request_id(request_id=request_data.request_id)
+    request_data = stk.get_requests(request_url='https://statusinvest.com.br/account/userdata')
+    value = stk.get_response_body_from_request_id(request_id=request_data[0].request_id)
     stk.quit()
 
     assert value

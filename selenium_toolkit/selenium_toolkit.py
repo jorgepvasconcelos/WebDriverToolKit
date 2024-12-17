@@ -5,6 +5,8 @@ from random import uniform
 from typing import Union, Type
 from dataclasses import dataclass
 from http.cookies import SimpleCookie
+
+import trio
 from selenium.webdriver.chromium.webdriver import ChromiumDriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
@@ -69,25 +71,37 @@ class SeleniumToolKit:
     def goto(self, url: str) -> None:
         self.__driver.get(url=url)
 
-    def query_selector(self, query_selector: str) -> Union[WebElement, None]:
+    def query_selector(self, query_selector: str, web_element: WebElement = None) -> Union[WebElement, None]:
+        """
+        :param query_selector: css or xpath
+        :param web_element:  If None is passed will perform the query selector in the whole page
+        """
         if not query_selector:
             raise ValueError('You need send a query_selector')
 
+        target = web_element if web_element else self.__driver
+
         if query_selector[0] == '/':
-            web_element = self.__driver.find_element(By.XPATH, query_selector)
+            web_element = target.find_element(By.XPATH, query_selector)
         else:
-            web_element = self.__driver.find_element(By.CSS_SELECTOR, query_selector)
+            web_element = target.find_element(By.CSS_SELECTOR, query_selector)
 
         return web_element
 
-    def query_selector_all(self, query_selector: str) -> Union[list[WebElement], None]:
+    def query_selector_all(self, query_selector: str, web_element: WebElement = None) -> Union[list[WebElement], None]:
+        """
+        :param query_selector: css or xpath
+        :param web_element:  If None is passed will perform the query selector in the whole page
+        """
         if not query_selector:
             raise ValueError('You need send a query_selector')
 
+        target = web_element if web_element else self.__driver
+
         if query_selector[0] == '/':
-            web_elements = self.__driver.find_elements(By.XPATH, query_selector)
+            web_elements = target.find_elements(By.XPATH, query_selector)
         else:
-            web_elements = self.__driver.find_elements(By.CSS_SELECTOR, query_selector)
+            web_elements = target.find_elements(By.CSS_SELECTOR, query_selector)
 
         return web_elements
 

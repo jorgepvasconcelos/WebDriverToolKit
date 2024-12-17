@@ -4,15 +4,13 @@ from selenium.webdriver import Chrome
 from selenium.webdriver.chrome.options import Options
 
 from selenium_toolkit import SeleniumToolKit
+from tests.get_driver import get_selenium_toolkit
 
 
 def test_element_is_present():
-    options = Options()
-    driver = Chrome(options=options)
+    stk = get_selenium_toolkit()
 
-    sk = SeleniumToolKit(driver=driver)
+    stk.goto('https://webscraper.io/test-sites/e-commerce/allinone/product/545')
+    stk.element_is_present(wait_time=5, query_selector='[class="pull-right price"]')
 
-    sk.goto('https://webscraper.io/test-sites/e-commerce/allinone/product/545')
-    sk.element_is_present(wait_time=5, query_selector='[class="pull-right price"]')
-
-    driver.close()
+    stk.quit()

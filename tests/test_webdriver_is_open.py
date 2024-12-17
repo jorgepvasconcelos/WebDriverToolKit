@@ -4,18 +4,15 @@ from selenium.webdriver import Chrome
 from selenium.webdriver.chrome.options import Options
 
 from selenium_toolkit import SeleniumToolKit
+from tests.get_driver import get_selenium_toolkit
 
 
 def test_webdriver_is_open():
-    options = Options()
-    options.add_argument('--start-maximized')
-    driver = Chrome(options=options)
+    stk = get_selenium_toolkit()
 
-    sk = SeleniumToolKit(driver=driver)
-
-    sk.goto('https://webscraper.io/test-sites/e-commerce/allinone/product/545')
+    stk.goto('https://webscraper.io/test-sites/e-commerce/allinone/product/545')
 
     time.sleep(2)
-    driver.close()
+    stk.quit()
 
-    assert not sk.webdriver_is_open()
+    assert not stk.webdriver_is_open()
