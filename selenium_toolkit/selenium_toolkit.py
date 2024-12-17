@@ -20,6 +20,7 @@ from enum import StrEnum
 
 
 class RequestType(StrEnum):
+    DOCUMENT = 'Document'
     XHR = 'XHR'
     IMAGE = 'Image'
     SCRIPT = 'Script'
@@ -30,12 +31,18 @@ class RequestType(StrEnum):
 
 
 @dataclass
+class Redirect:
+    url: str
+
+
+@dataclass
 class Request:
     url: str
     request_id: str
     cookies: dict
     headers: dict
-    type: RequestType
+    redirect: Redirect = None
+    type: RequestType = None
 
 
 def auto_wait(func) -> Type["Response"]:
@@ -233,8 +240,7 @@ class SeleniumToolKit:
         except InvalidSessionIdException:
             return False
 
-    def get_requests(self, request_url: str) -> list[Request] | None:
-
+    def get_all_requests(self) -> list[dict]:
         """
         !!! ALERT !!!
         For this method works the code below is necessary in the driver's creation
@@ -254,12 +260,16 @@ class SeleniumToolKit:
 
         logs_raw = self.__driver.get_log("performance")
         parsed_logs = [json.loads(lr["message"])["message"] for lr in logs_raw]
+        return parsed_logs
 
-        methods = ["Network.responseReceived", 'Network.requestWillBeSent', 'Network.requestWillBeSentExtraInfo']
+    def get_requests(self, request_url: str) -> list[Request] | None:
+        parsed_logs = self.get_all_requests()
+        methods = ["Network.responseReceived", 'Network.requestWillBeSent', 'Network.requestWillBeSentExtraInfo',
+                   # "Page.windowOpen"  # I Only see in Redirect, maybe add in the future, does not have request_id
+                   ]
         received_response_list = [response for response in parsed_logs if response["method"] in methods]
 
         resp_url = None
-        target_request_id = None
         matched_requests_id = set()
         for response in received_response_list:
             params = response["params"]
@@ -268,6 +278,8 @@ class SeleniumToolKit:
                 resp_url = params['request']['url']
             elif params.get("response"):
                 resp_url = params['response']['url']
+            elif params.get("redirectResponse"):
+                resp_url = params['redirectResponse']["url"]
 
             if resp_url and request_url in resp_url:
                 matched_requests_id.add(target_request_id)
@@ -280,6 +292,7 @@ class SeleniumToolKit:
             cookies = dict()
             headers = dict()
             url: str = None
+            redirect = None
             request_type: RequestType = None
             for response in received_response_list:
                 params = response["params"]
@@ -302,11 +315,17 @@ class SeleniumToolKit:
                     if method == 'Network.requestWillBeSent':
                         url = params['request']['url']
                         request_type = RequestType(params['type'])
+                        
+                        if params.get("redirectResponse"):
+                            redirect_url = params['redirectResponse']['url']
+                            if request_url in redirect_url:
+                                redirect = Redirect(url=redirect_url)
 
             request_data = Request(url=url,
                                    request_id=target_request_id,
                                    cookies=cookies,
                                    headers=headers,
+                                   redirect=redirect,
                                    type=request_type)
             matched_requests.append(request_data)
 
@@ -328,12 +347,11 @@ class SeleniumToolKit:
 
     def get_response_body_from_request_id(self, request_id: str = None) -> str | None:
         try:
-            response_body = self.execute_cdp_cmd(cmd="Network.getResponseBody",cmd_args={"requestId": request_id})
+            response_body = self.execute_cdp_cmd(cmd="Network.getResponseBody", cmd_args={"requestId": request_id})
         except WebDriverException:
             return None
 
         return response_body
-
 
     # def execute_cdp_cmd(self, cmd: str, cmd_args: dict) -> str:
     #     execute_command = {'method': cmd, 'params': cmd_args}
