@@ -5,6 +5,9 @@ from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.service import Service
 from selenium_toolkit import SeleniumToolKit
 
+HOST = "localhost"
+WEBDRIVER_URL = f'http://{HOST}:4444/wd/hub'
+
 
 def get_latest_chrome_driver_path() -> str:
     latest_driver_path = ChromeDriverManager().install()
@@ -12,15 +15,34 @@ def get_latest_chrome_driver_path() -> str:
 
 
 def get_selenium_toolkit() -> SeleniumToolKit:
-    options = Options()
-    options.add_argument('--start-maximized')
+    browser_version = "125.0"
+    options = webdriver.ChromeOptions()
+    capabilities = {
+        "browserName": "chrome",
+        "browserVersion": browser_version,
+        "selenoid:options": {
+            "enableVideo": False,  # Will record screen
+            "enableVNC": False,
+        }
+    }
+    options.browser_version = browser_version
 
-    capabilities = {"performance": "ALL"}
-    options.set_capability("goog:loggingPrefs", capabilities)
+    extra_capabilities = {
+        "goog:loggingPrefs": {"performance": "ALL"}
+    }
 
-    executable_path = get_latest_chrome_driver_path()
-    driver = webdriver.Chrome(options=options,
-                              service=Service(executable_path=executable_path))
+    capabilities.update(extra_capabilities)
+
+    [options.set_capability(name=k, value=v) for k, v in capabilities.items()]
+
+    driver = webdriver.Remote(command_executor=WEBDRIVER_URL,
+                              options=options)
+
+    # executable_path = get_latest_chrome_driver_path()
+    # driver = webdriver.Chrome(options=options, service=Service(executable_path=executable_path))
 
     stk = SeleniumToolKit(driver=driver)
     return stk
+
+if __name__ == '__main__':
+    driver = get_selenium_toolkit()

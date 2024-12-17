@@ -11,7 +11,8 @@ repository = "https://github.com/jorgepvasconcelos/webdriver-toolkit"
 
 [tool.poetry.dependencies]
 python = "^3.9"
-selenium = "^4.2.0"
+selenium = "4.25.0"
+pytest-html = "^4.1.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "*"

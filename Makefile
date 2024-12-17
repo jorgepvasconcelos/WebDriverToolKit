@@ -1,11 +1,7 @@
+test:
+	poetry run python -m pytest --html=report.html
 
-## @ Tests Commands
-.PHONY: test
-test: ## Run tests
-	pytest -v
-
-.PHONY: pypi
-pypi: ## update version in pypi
-	poetry build
-	poetry publish
-
+install:
+	poetry install && \
+	poetry run python generate_docker_pull.py && \
+	sh pull_images.sh
