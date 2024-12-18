@@ -272,17 +272,19 @@ class SeleniumToolKit:
         resp_url = None
         matched_requests_id = set()
         for response in received_response_list:
+            urls_to_match = []
             params = response["params"]
             target_request_id = params.get("requestId")
             if params.get("request"):
-                resp_url = params['request']['url']
-            elif params.get("response"):
-                resp_url = params['response']['url']
-            elif params.get("redirectResponse"):
-                resp_url = params['redirectResponse']["url"]
+                urls_to_match.append(params['request']['url'])
+            if params.get("response"):
+                urls_to_match.append(params['response']['url'])
+            if params.get("redirectResponse"):
+                urls_to_match.append(params['redirectResponse']["url"])
 
-            if resp_url and request_url in resp_url:
-                matched_requests_id.add(target_request_id)
+            for url in urls_to_match:
+                if request_url in url:
+                    matched_requests_id.add(target_request_id)
 
         if not matched_requests_id:
             return None
