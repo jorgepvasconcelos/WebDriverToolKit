@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "selenium-toolkit"
-version = "0.0.8"
+version = "0.0.9"
 description = "this is not a awesome description"
 license = "MIT"
 authors = ["Jorge Vasconcelos <john@example.com>"]
@@ -12,10 +12,11 @@ repository = "https://github.com/jorgepvasconcelos/webdriver-toolkit"
 [tool.poetry.dependencies]
 python = "^3.9"
 selenium = "4.25.0"
-pytest-html = "^4.1.1"
+
 
 [tool.poetry.dev-dependencies]
 pytest = "*"
+pytest-html = "*"
 webdriver-manager = '*'
 
 [build-system]
