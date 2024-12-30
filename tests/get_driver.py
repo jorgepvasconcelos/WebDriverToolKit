@@ -22,7 +22,7 @@ def get_selenium_toolkit() -> SeleniumToolKit:
         "browserVersion": browser_version,
         "selenoid:options": {
             "enableVideo": False,  # Will record screen
-            "enableVNC": False,
+            "enableVNC": True,
         }
     }
     options.browser_version = browser_version

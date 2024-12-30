@@ -317,7 +317,7 @@ class SeleniumToolKit:
                     if method == 'Network.requestWillBeSent':
                         url = params['request']['url']
                         request_type = RequestType(params['type'])
-                        
+
                         if params.get("redirectResponse"):
                             redirect_url = params['redirectResponse']['url']
                             if request_url in redirect_url:
@@ -374,7 +374,19 @@ class SeleniumToolKit:
         response = self.__driver.command_executor._request('POST', url, body)
         return response.get('value')
 
-    def get_all_local_storage(self) -> dict:
+    def scroll_window(self, query_selector: str = None, web_element: WebElement = None) -> None:
+        """
+        Scrolls window to element position
+        """
+        assert query_selector or web_element, "You need to provide query_selector or web_element"
+
+        if web_element is None:
+            web_element = self.query_selector(query_selector=query_selector)
+
+        js_code = "arguments[0].scrollIntoView();"
+        self.__driver.execute_script(js_code, web_element)
+
+    def get_all_local_storage(self, ) -> dict:
         return self.__driver.execute_script(f"return window.localStorage")
 
     def quit(self):
